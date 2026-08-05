@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 專屬營養師</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header">
+        <h1>我的 AI 營養師</h1>
+        <nav>
+            <a href="index.html" class="active">今日紀錄</a>
+            <a href="history.html">歷史回顧</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <section class="summary-section">
+            <h2 id="current-date">📅 日期：載入中...</h2>
+            <div class="goal-card">
+                <h3>🎯 每日目標</h3>
+                <p class="goal-number">1,848 <span class="unit">kcal</span></p>
+            </div>
+            
+            <div class="status-cards">
+                <div class="status-card">
+                    <h4>已攝取</h4>
+                    <p id="total-consumed">0 <span class="unit">kcal</span></p>
+                </div>
+                <div class="status-card">
+                    <h4>剩餘熱量</h4>
+                    <p id="remaining-calories">1,848 <span class="unit">kcal</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section class="upload-section">
+            <div class="upload-box">
+                <label for="image-upload" class="upload-label">
+                    <span class="icon">📸</span>
+                    <span class="text">點擊拍照或上傳餐點照片</span>
+                </label>
+                <input type="file" id="image-upload" accept="image/*" capture="environment">
+            </div>
+            
+            <div id="preview-container" class="preview-container" style="display: none;">
+                <img id="image-preview" src="" alt="餐點預覽">
+                <div class="meal-select-container">
+                     <label for="meal-type">這是哪一餐？</label>
+                     <select id="meal-type">
+                         <option value="早餐">早餐</option>
+                         <option value="午餐" selected>午餐</option>
+                         <option value="晚餐">晚餐</option>
+                         <option value="點心">點心</option>
+                         <option value="飲料">飲料</option>
+                     </select>
+                </div>
+                <button id="analyze-btn" class="analyze-btn">🚀 傳送給 AI 分析</button>
+            </div>
+
+            <div id="loading-spinner" class="loading-container" style="display: none;">
+                <div class="spinner"></div>
+                <p>AI 營養師正在努力計算中，請稍候...</p>
+            </div>
+        </section>
+
+        <section class="table-section">
+            <div class="table-responsive">
+                <table id="nutrition-table">
+                    <thead>
+                        <tr>
+                            <th>餐別</th>
+                            <th>食物名稱</th>
+                            <th>總大卡</th>
+                            <th>碳水 (g)</th>
+                            <th>蛋白質 (g)</th>
+                            <th>脂肪 (g)</th>
+                            <th>營養建議</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr class="empty-row">
+                            <td colspan="7">今天還沒有任何紀錄喔！趕快上傳第一餐吧！</td>
+                        </tr>
+                    </tbody>
+                    <tfoot id="table-footer">
+                        <!-- 日總結會動態產生在這裡 -->
+                    </tfoot>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 引入我們的三個大腦 -->
+    <script src="js/storage.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>
