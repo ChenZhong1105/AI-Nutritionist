@@ -72,7 +72,8 @@ async function analyzeFoodImage(base64Image, mealType) {
 
     } catch (error) {
         console.error("AI 分析發生錯誤:", error);
-        alert("AI 分析失敗，請檢查網路連線或確認照片是否清晰。");
+        // 把 error.message 加進去，讓它顯示具體原因！
+        alert("錯誤代碼：" + error.message); 
         return null;
     }
 }
