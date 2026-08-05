@@ -3,7 +3,7 @@
    ========================================= */
 
 // ⚠️ 記得在這裡填入你的 API Key！
-const GEMINI_API_KEY = 'AQ.Ab8RN6LRQdWcBgzUP8YAo-I7sf0GNZ799eoJsO40ZvIuLIz3Wg';
+const GEMINI_API_KEY = 'AQ.Ab8RN6JYryDOKIHjPjlL6dy8u-1DUEl4TexokBPLXXVa2W-1CQ';
 
 async function analyzeFoodImage(base64Image, mealType) {
     if (GEMINI_API_KEY === '請把這串字換成你申請的_GEMINI_API_KEY') {
