@@ -18,7 +18,7 @@ const DAILY_GOAL = 1848;
 let currentBase64Image = null; 
 
 function init() {
-    currentDateElement.textContent = `📅 日期：${getTodayDisplay()}`;
+    currentDateElement.textContent = `今日日期：${getTodayDisplay()}`;
     const todayData = getTodayData(); 
     renderTable(todayData);
 }
