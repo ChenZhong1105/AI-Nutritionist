@@ -1,0 +1,284 @@
+/* =========================================
+   1. 基礎設定與變數 (低飽和度質感配色)
+   ========================================= */
+:root {
+    --primary-color: #6a8c69;    
+    --primary-dark: #4a6349;     
+    --bg-color: #f4f6f4;         
+    --card-bg: #ffffff;          
+    --text-main: #333333;        
+    --text-muted: #777777;       
+    --border-color: #e2e6e2;     
+    --highlight-bg: #edf2ed;     
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+/* =========================================
+   2. 導覽列 (Header)
+   ========================================= */
+.header {
+    background-color: var(--card-bg);
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); 
+}
+
+.header h1 {
+    font-size: 22px;
+    color: var(--primary-dark);
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+.header nav a {
+    text-decoration: none;
+    color: var(--text-muted);
+    margin: 0 15px;
+    padding-bottom: 5px;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.header nav a.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.header nav a:hover {
+    color: var(--primary-dark);
+}
+
+/* =========================================
+   3. 主要內容容器
+   ========================================= */
+.container {
+    max-width: 800px; 
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+/* =========================================
+   4. 摘要區塊
+   ========================================= */
+.summary-section {
+    margin-bottom: 30px;
+}
+
+#current-date {
+    font-size: 16px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.goal-card, .status-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.goal-card {
+    margin-bottom: 15px;
+    border-top: 4px solid var(--primary-color);
+}
+
+.goal-card h3, .status-card h4 {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.goal-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--primary-dark);
+}
+
+.unit {
+    font-size: 16px;
+    font-weight: normal;
+    color: var(--text-muted);
+}
+
+.status-cards {
+    display: flex;
+    gap: 15px; 
+}
+
+.status-card {
+    flex: 1;
+}
+
+.status-card p {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+/* =========================================
+   5. 拍照上傳區塊
+   ========================================= */
+.upload-section {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-bottom: 30px;
+}
+
+.upload-box input[type="file"] {
+    display: none; 
+}
+
+.upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-label:hover {
+    background-color: var(--highlight-bg);
+    border-color: var(--primary-color);
+}
+
+.upload-label .icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.upload-label .text {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.preview-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#image-preview {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.meal-select-container {
+    margin-bottom: 20px;
+}
+
+.meal-select-container select {
+    padding: 8px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 16px;
+    color: var(--text-main);
+    outline: none;
+}
+
+.analyze-btn {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 14px 30px;
+    border-radius: 30px; 
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    max-width: 250px;
+}
+
+.analyze-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+.loading-container {
+    margin-top: 20px;
+    color: var(--text-muted);
+}
+
+.spinner {
+    border: 3px solid var(--border-color);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* =========================================
+   6. 表格區塊
+   ========================================= */
+.table-section {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.table-responsive {
+    overflow-x: auto; 
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+th, td {
+    padding: 14px 15px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+}
+
+th {
+    background-color: var(--highlight-bg);
+    color: var(--primary-dark);
+    font-weight: 500;
+    white-space: nowrap; 
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.empty-row td {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px 20px;
+}
