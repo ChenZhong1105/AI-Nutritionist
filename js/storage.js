@@ -61,7 +61,25 @@ function saveMealData(mealData, dateKey) {
         };
     }
     
+    // 將新資料加入陣列
     allData[dateKey].meals.push(mealData);
+    
+    // 🌟 全新邏輯：每次存入後，自動依照順序重新排列！
+    const orderMap = {
+        "早餐": 1,
+        "午餐": 2,
+        "晚餐": 3,
+        "點心": 4,
+        "飲料": 5
+    };
+    
+    allData[dateKey].meals.sort((a, b) => {
+        const orderA = orderMap[a.mealType] || 99; // 如果未來有未知的餐別，自動排到最後
+        const orderB = orderMap[b.mealType] || 99;
+        return orderA - orderB;
+    });
+    
+    // 累加熱量與營養素
     allData[dateKey].totals.calories += Number(mealData.totalCalories);
     allData[dateKey].totals.carbs += Number(mealData.carbs);
     allData[dateKey].totals.protein += Number(mealData.protein);
