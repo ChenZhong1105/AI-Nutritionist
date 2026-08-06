@@ -46,8 +46,26 @@ body {
 .dashboard-section { margin-bottom: 25px; }
 .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 5px; }
 .dash-header h2 { font-size: 18px; color: var(--primary-color); }
-.edit-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; font-weight: 500; }
+
+.edit-btn { 
+    background: none; 
+    border: none; 
+    color: var(--text-muted); 
+    cursor: pointer; 
+    font-size: 14px; 
+    font-weight: 500; 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+    transition: color 0.2s; 
+}
 .edit-btn:hover { color: var(--accent-color); }
+/* 確保 SVG 的大小與文字完美搭配 */
+.edit-btn svg {
+    width: 14px;
+    height: 14px;
+    margin-bottom: 1px;
+}
 
 .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .dash-card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
@@ -112,7 +130,7 @@ th { color: var(--text-muted); font-weight: 500; background: #f8fafc; }
 .modal-footer { padding: 15px 20px; border-top: 1px solid var(--border-color); }
 
 /* =========================================
-   新增：歷史紀錄卡片專屬樣式
+   歷史紀錄卡片專屬樣式
    ========================================= */
 .history-card { 
     background: var(--card-bg); 
@@ -174,7 +192,7 @@ th { color: var(--text-muted); font-weight: 500; background: #f8fafc; }
 .history-macro-item span:last-child { font-weight: 500; }
 
 /* =========================================
-   新增：歷史詳細餐點清單卡片
+   歷史詳細餐點清單卡片
    ========================================= */
 .history-meal-card { 
     background: #f8fafc; 
