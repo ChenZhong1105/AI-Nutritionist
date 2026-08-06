@@ -20,11 +20,11 @@
     <main class="container">
         
         <section class="summary-section">
-            <h2 style="text-align: center; color: var(--primary-color);">📅 歷史回顧</h2>
+            <!-- 已經把前面的表情符號拿掉了！ -->
+            <h2 style="text-align: center; color: var(--primary-color);">歷史回顧</h2>
             <p style="text-align: center; color: var(--text-muted); margin-top: 10px; font-size: 14px;">點擊卡片可查看當日詳細飲食評語與建議</p>
         </section>
 
-        <!-- 歷史紀錄卡片會動態產生在這裡 -->
         <section id="history-container">
         </section>
 
@@ -35,14 +35,12 @@
 
     </main>
 
-    <!-- 🌟 全新的歷史詳細紀錄彈出視窗 -->
     <div id="history-modal" class="modal">
         <div class="modal-content" style="max-height: 85vh; display: flex; flex-direction: column;">
             <div class="modal-header">
                 <h3 id="history-modal-date">YYYY/MM/DD</h3>
                 <span class="close-btn" id="close-history-modal">&times;</span>
             </div>
-            <!-- 加入 overflow-y: auto 讓內容過多時可以在視窗內滑動 -->
             <div class="modal-body" id="history-modal-body" style="overflow-y: auto; padding-bottom: 20px;">
                 <!-- 詳細餐點卡片會在這裡 -->
             </div>
