@@ -1,13 +1,8 @@
 /* =========================================
-   app.js - 負責首頁畫面互動與資料呈現
+   app.js - 負責首頁畫面互動與資料呈現 (無 API 安全版)
    ========================================= */
 
-const imageUpload = document.getElementById('image-upload');
-const previewContainer = document.getElementById('preview-container');
-const imagePreview = document.getElementById('image-preview');
-const analyzeBtn = document.getElementById('analyze-btn');
-const loadingSpinner = document.getElementById('loading-spinner');
-const mealTypeSelect = document.getElementById('meal-type');
+const jsonUpload = document.getElementById('json-upload');
 const currentDateElement = document.getElementById('current-date');
 const totalConsumedElement = document.getElementById('total-consumed');
 const remainingCaloriesElement = document.getElementById('remaining-calories');
@@ -15,7 +10,6 @@ const tableBody = document.getElementById('table-body');
 const tableFooter = document.getElementById('table-footer');
 
 const DAILY_GOAL = 1848; 
-let currentBase64Image = null; 
 
 function init() {
     currentDateElement.textContent = `今日日期：${getTodayDisplay()}`;
@@ -23,45 +17,36 @@ function init() {
     renderTable(todayData);
 }
 
-imageUpload.addEventListener('change', function(event) {
+// 處理 JSON 檔案上傳
+jsonUpload.addEventListener('change', function(event) {
     const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            currentBase64Image = e.target.result;
-            imagePreview.src = currentBase64Image;
-            previewContainer.style.display = 'flex';
-            document.querySelector('.upload-label').style.display = 'none';
+    if (!file) return;
+
+    const reader = new FileReader();
+    
+    // 當檔案讀取完成時...
+    reader.onload = function(e) {
+        try {
+            // 把檔案內容轉回 JavaScript 看得懂的資料
+            const nutritionData = JSON.parse(e.target.result);
+            
+            // 存進 LocalStorage
+            const updatedData = saveMealData(nutritionData);
+            
+            // 重新畫表格
+            renderTable(updatedData);
+            
+            alert('✅ 紀錄匯入成功！');
+        } catch (error) {
+            alert('❌ 檔案格式錯誤，請確認這是 AI 產生的 JSON 檔。');
         }
-        reader.readAsDataURL(file);
-    }
-});
-
-analyzeBtn.addEventListener('click', async () => {
-    if (!currentBase64Image) {
-        alert('請先上傳或拍攝照片！');
-        return;
-    }
-
-    const mealType = mealTypeSelect.value;
-
-    loadingSpinner.style.display = 'block';
-    analyzeBtn.style.display = 'none';
-
-    const nutritionData = await analyzeFoodImage(currentBase64Image, mealType);
-
-    if (nutritionData) {
-        const updatedData = saveMealData(nutritionData);
-        renderTable(updatedData);
         
-        previewContainer.style.display = 'none';
-        document.querySelector('.upload-label').style.display = 'flex';
-        currentBase64Image = null;
-        imageUpload.value = ''; 
-    }
+        // 清空上傳欄位，方便下次匯入
+        jsonUpload.value = '';
+    };
 
-    loadingSpinner.style.display = 'none';
-    analyzeBtn.style.display = 'block';
+    // 以純文字方式讀取 .json 檔
+    reader.readAsText(file);
 });
 
 function renderTable(todayData) {
@@ -76,7 +61,7 @@ function renderTable(todayData) {
     if (todayData.meals.length === 0) {
         tableBody.innerHTML = `
             <tr class="empty-row">
-                <td colspan="7">今天還沒有任何紀錄喔！趕快上傳第一餐吧！</td>
+                <td colspan="7">今天還沒有任何紀錄喔！趕快上傳 AI 檔案吧！</td>
             </tr>
         `;
         tableFooter.innerHTML = '';
