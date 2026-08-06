@@ -1,86 +1,103 @@
 /* =========================================
-   app.js - 負責首頁畫面互動與資料呈現 (支援切換日期與刪除)
+   app.js - 首頁邏輯大腦 (支援環形圖與BMR計算機)
    ========================================= */
 
 const importBtn = document.getElementById('import-btn');
 const jsonInput = document.getElementById('json-input');
 const dateInput = document.getElementById('record-date');
-const totalConsumedElement = document.getElementById('total-consumed');
-const remainingCaloriesElement = document.getElementById('remaining-calories');
 const tableBody = document.getElementById('table-body');
 const tableFooter = document.getElementById('table-footer');
 
-const DAILY_GOAL = 1848; 
+// Modal 相關元素
+const modal = document.getElementById('settings-modal');
+const editBtn = document.getElementById('edit-goal-btn');
+const closeBtn = document.getElementById('close-modal');
+const calcSaveBtn = document.getElementById('calc-save-btn');
 
-// 網頁載入時的初始化
+let userProfile = getUserProfile();
+
 function init() {
-    // 把日期預設設定為今天
     dateInput.value = getTodayKey();
-    // 讀取這天的資料並畫出表格
     loadDateData();
 }
 
-// 根據選定的日期，載入並顯示資料
 function loadDateData() {
     const selectedDate = dateInput.value;
     if (selectedDate) {
         const data = getDataByDate(selectedDate);
+        renderDashboard(data);
         renderTable(data);
     }
 }
 
-// 當使用者切換日期時，表格自動更新！
 dateInput.addEventListener('change', loadDateData);
 
-// 處理文字貼上並匯入到「選定日期」
+// 處理環形圖與儀表板顯示
+function renderDashboard(dayData) {
+    const { calories, carbs, protein, fat } = dayData.totals;
+    const goal = userProfile;
+    
+    // 計算剩餘
+    let remCal = goal.calories - calories;
+    let remCarbs = goal.carbs - carbs;
+    let remPro = goal.protein - protein;
+    let remFat = goal.fat - fat;
+
+    // 更新文字
+    document.getElementById('dash-rem-cal').textContent = remCal < 0 ? 0 : remCal;
+    document.getElementById('dash-goal-cal').textContent = `目標 ${goal.calories} 千卡`;
+    
+    document.getElementById('dash-carbs-val').textContent = carbs;
+    document.getElementById('dash-carbs-goal').textContent = goal.carbs;
+    
+    document.getElementById('dash-pro-val').textContent = protein;
+    document.getElementById('dash-pro-goal').textContent = goal.protein;
+    
+    document.getElementById('dash-fat-val').textContent = fat;
+    document.getElementById('dash-fat-goal').textContent = goal.fat;
+
+    // 更新環形動畫 (計算 offset)
+    // 大環形 circumference = 408
+    const calPercent = Math.min(calories / goal.calories, 1);
+    document.getElementById('cal-ring').style.strokeDashoffset = 408 - (408 * calPercent);
+
+    // 小環形 circumference = 100
+    const carbsPercent = Math.min(carbs / goal.carbs, 1);
+    document.getElementById('carbs-ring').style.strokeDashoffset = 100 - (100 * carbsPercent);
+    
+    const proPercent = Math.min(protein / goal.protein, 1);
+    document.getElementById('pro-ring').style.strokeDashoffset = 100 - (100 * proPercent);
+    
+    const fatPercent = Math.min(fat / goal.fat, 1);
+    document.getElementById('fat-ring').style.strokeDashoffset = 100 - (100 * fatPercent);
+}
+
+// 處理匯入
 importBtn.addEventListener('click', () => {
     const jsonText = jsonInput.value.trim();
     const selectedDate = dateInput.value;
-    
-    if (!jsonText) {
-        alert('請先貼上 AI 提供的分析資料喔！');
-        return;
-    }
-    
-    if (!selectedDate) {
-        alert('請先選擇一個日期！');
-        return;
-    }
-
+    if (!jsonText || !selectedDate) return alert('請確認日期並貼上 AI 資料！');
     try {
         const nutritionData = JSON.parse(jsonText);
-        // 把資料存到畫面選定的那一天
         const updatedData = saveMealData(nutritionData, selectedDate);
+        renderDashboard(updatedData);
         renderTable(updatedData);
-        
         alert('✅ 紀錄匯入成功！');
-        jsonInput.value = ''; // 清空輸入框
+        jsonInput.value = ''; 
     } catch (error) {
-        alert('❌ 格式錯誤！請確定你有完整複製 AI 給的 { ... } 內容。');
+        alert('❌ 格式錯誤！請確定完整複製了 { ... } 內容。');
     }
 });
 
-// 畫出表格的程式碼 (升級刪除按鈕版)
+// 畫表格
 function renderTable(dayData) {
-    const totalCalories = dayData.totals.calories;
-    const remaining = DAILY_GOAL - totalCalories;
-    
-    totalConsumedElement.innerHTML = `${totalCalories} <span class="unit">kcal</span>`;
-    remainingCaloriesElement.innerHTML = `${remaining} <span class="unit">kcal</span>`;
-    
     tableBody.innerHTML = '';
-    
     if (dayData.meals.length === 0) {
-        tableBody.innerHTML = `
-            <tr class="empty-row">
-                <td colspan="8">這天尚無紀錄，請貼上 AI 分析資料。</td>
-            </tr>
-        `;
+        tableBody.innerHTML = `<tr class="empty-row"><td colspan="8">這天尚無紀錄，請貼上 AI 分析資料。</td></tr>`;
         tableFooter.innerHTML = '';
         return;
     }
 
-    // 加入 index，用來辨識我們要刪除哪一筆
     dayData.meals.forEach((meal, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -90,49 +107,80 @@ function renderTable(dayData) {
             <td>${meal.carbs}</td>
             <td>${meal.protein}</td>
             <td>${meal.fat}</td>
-            <td style="font-size: 14px; max-width: 250px;">${meal.advice}</td>
+            <td style="font-size: 13px; max-width: 250px;">${meal.advice}</td>
             <td><button class="delete-btn" data-index="${index}">刪除</button></td>
         `;
         tableBody.appendChild(tr);
     });
 
-    const carbsGoal = 185;
-    const proteinGoal = 140;
-    const fatGoal = 60;
-    
-    const carbsDiff = dayData.totals.carbs - carbsGoal;
-    const proteinDiff = dayData.totals.protein - proteinGoal;
-    const fatDiff = dayData.totals.fat - fatGoal;
-
-    const formatDiff = (val) => val > 0 
-        ? `<span style="color: red;">(超標 ${val}g)</span>` 
-        : `<span style="color: var(--accent-color);">(未達標 ${Math.abs(val)}g)</span>`;
-
     tableFooter.innerHTML = `
-        <tr style="background-color: var(--highlight-bg); font-weight: bold;">
+        <tr style="background: #f8fafc; font-weight: bold;">
             <td colspan="2">日總結</td>
             <td>${dayData.totals.calories}</td>
-            <td>${dayData.totals.carbs} <br> ${formatDiff(carbsDiff)}</td>
-            <td>${dayData.totals.protein} <br> ${formatDiff(proteinDiff)}</td>
-            <td>${dayData.totals.fat} <br> ${formatDiff(fatDiff)}</td>
-            <td colspan="2" style="font-size: 14px; font-weight: normal; max-width: 250px;">請根據未達標之營養素調整明日飲食。</td>
+            <td>${dayData.totals.carbs}</td>
+            <td>${dayData.totals.protein}</td>
+            <td>${dayData.totals.fat}</td>
+            <td colspan="2"></td>
         </tr>
     `;
 }
 
-// 監聽表格內的點擊事件 (處理刪除按鈕)
 tableBody.addEventListener('click', (e) => {
-    // 檢查點擊的是不是刪除按鈕
     if (e.target.classList.contains('delete-btn')) {
-        const mealIndex = e.target.getAttribute('data-index');
-        const selectedDate = dateInput.value;
-        
-        // 跳出確認視窗防呆
-        if (confirm('確定要刪除這筆紀錄嗎？這筆熱量將會被扣除喔！')) {
-            const updatedData = deleteMealData(selectedDate, mealIndex);
-            renderTable(updatedData); // 重新畫表格
+        if (confirm('確定要刪除這筆紀錄嗎？')) {
+            const index = e.target.getAttribute('data-index');
+            const updatedData = deleteMealData(dateInput.value, index);
+            renderDashboard(updatedData);
+            renderTable(updatedData);
         }
     }
+});
+
+// --- Modal 與計算機邏輯 ---
+editBtn.addEventListener('click', () => {
+    // 帶入先前的設定
+    document.getElementById('user-gender').value = userProfile.gender;
+    document.getElementById('user-age').value = userProfile.age;
+    document.getElementById('user-height').value = userProfile.height;
+    document.getElementById('user-weight').value = userProfile.weight;
+    document.getElementById('user-activity').value = userProfile.activity;
+    modal.classList.add('show');
+});
+
+closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+
+calcSaveBtn.addEventListener('click', () => {
+    const gender = document.getElementById('user-gender').value;
+    const age = Number(document.getElementById('user-age').value);
+    const height = Number(document.getElementById('user-height').value);
+    const weight = Number(document.getElementById('user-weight').value);
+    const activity = Number(document.getElementById('user-activity').value);
+    
+    // Mifflin-St Jeor 公式
+    let bmr = 10 * weight + 6.25 * height - 5 * age;
+    bmr = gender === 'male' ? bmr + 5 : bmr - 161;
+    
+    // 計算 TDEE 與 營養素
+    const tdee = Math.round(bmr * activity);
+    const carbs = Math.round((tdee * 0.4) / 4);
+    const protein = Math.round((tdee * 0.3) / 4);
+    const fat = Math.round((tdee * 0.3) / 9);
+
+    document.getElementById('res-bmr').textContent = Math.round(bmr);
+    document.getElementById('res-tdee').textContent = tdee;
+
+    // 儲存進設定
+    userProfile = {
+        calories: tdee, carbs, protein, fat,
+        gender, age, height, weight, activity
+    };
+    saveUserProfile(userProfile);
+    
+    setTimeout(() => {
+        modal.classList.remove('show');
+        loadDateData(); // 重新整理畫面套用新目標
+        alert('🎯 每日目標已根據您的身體數值更新！');
+    }, 800);
 });
 
 document.addEventListener('DOMContentLoaded', init);
