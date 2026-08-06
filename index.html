@@ -38,17 +38,11 @@
             </div>
         </section>
 
-        <!-- 修改後的：匯入 JSON 檔案區塊 -->
+        <!-- 全新的文字貼上區塊 -->
         <section class="upload-section">
-            <div class="upload-box">
-                <label for="json-upload" class="upload-label">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" class="icon" viewBox="0 0 24 24">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-                    </svg>
-                    <span class="text">點擊匯入 AI 分析檔 (.json)</span>
-                </label>
-                <input type="file" id="json-upload" accept=".json">
-            </div>
+            <h3 style="margin-bottom: 12px; font-size: 16px; color: var(--primary-color);">📥 匯入 AI 分析結果</h3>
+            <textarea id="json-input" rows="7" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 15px; font-family: monospace; font-size: 14px;" placeholder="請將 AI 給你的 { ... } 資料完整貼在這裡..."></textarea>
+            <button id="import-btn" class="analyze-btn" style="width: 100%; max-width: 100%;">儲存並匯入紀錄</button>
         </section>
 
         <section class="table-section">
@@ -67,7 +61,7 @@
                     </thead>
                     <tbody id="table-body">
                         <tr class="empty-row">
-                            <td colspan="7">尚無紀錄，請上傳 AI 檔案。</td>
+                            <td colspan="7">尚無紀錄，請貼上 AI 分析資料。</td>
                         </tr>
                     </tbody>
                     <tfoot id="table-footer">
@@ -79,7 +73,7 @@
 
     </main>
 
-    <!-- 現在只需要載入 storage.js 和 app.js，不需要 api.js 了！ -->
+    <!-- 移除了 api.js，現在只需要這兩個大腦 -->
     <script src="js/storage.js"></script>
     <script src="js/app.js"></script>
 
