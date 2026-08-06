@@ -12,7 +12,7 @@
     <header class="header">
         <h1>AI 營養管理</h1>
         <nav>
-            <a href="index.html">今日紀錄</a>
+            <a href="index.html">單日紀錄</a>
             <a href="history.html" class="active">歷史回顧</a>
         </nav>
     </header>
@@ -21,21 +21,33 @@
         
         <section class="summary-section">
             <h2 style="text-align: center; color: var(--primary-color);">📅 歷史回顧</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-top: 10px;">檢視過去的飲食與熱量達標狀況</p>
+            <p style="text-align: center; color: var(--text-muted); margin-top: 10px; font-size: 14px;">點擊卡片可查看當日詳細飲食評語與建議</p>
         </section>
 
-        <section class="table-section" id="history-section">
-            <div id="history-empty-state" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-                <p>目前還沒有任何歷史紀錄喔！</p>
-                <p style="margin-top: 10px; font-size: 14px;">在「今日紀錄」匯入餐點後，紀錄就會出現在這裡。</p>
-            </div>
-
-            <div id="history-container">
-                <!-- 歷史紀錄卡片會動態產生在這裡 -->
-            </div>
+        <!-- 歷史紀錄卡片會動態產生在這裡 -->
+        <section id="history-container">
         </section>
+
+        <div id="history-empty-state" style="text-align: center; padding: 40px 20px; color: var(--text-muted); display: none;">
+            <p>目前還沒有任何歷史紀錄喔！</p>
+            <p style="margin-top: 10px; font-size: 14px;">在「單日紀錄」匯入餐點後，紀錄就會出現在這裡。</p>
+        </div>
 
     </main>
+
+    <!-- 🌟 全新的歷史詳細紀錄彈出視窗 -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content" style="max-height: 85vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h3 id="history-modal-date">YYYY/MM/DD</h3>
+                <span class="close-btn" id="close-history-modal">&times;</span>
+            </div>
+            <!-- 加入 overflow-y: auto 讓內容過多時可以在視窗內滑動 -->
+            <div class="modal-body" id="history-modal-body" style="overflow-y: auto; padding-bottom: 20px;">
+                <!-- 詳細餐點卡片會在這裡 -->
+            </div>
+        </div>
+    </div>
 
     <script src="js/storage.js"></script>
     <script src="js/history.js"></script>
