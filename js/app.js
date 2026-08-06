@@ -1,8 +1,9 @@
 /* =========================================
-   app.js - 負責首頁畫面互動與資料呈現 (無 API 安全版)
+   app.js - 負責首頁畫面互動與資料呈現 (文字貼上版)
    ========================================= */
 
-const jsonUpload = document.getElementById('json-upload');
+const importBtn = document.getElementById('import-btn');
+const jsonInput = document.getElementById('json-input');
 const currentDateElement = document.getElementById('current-date');
 const totalConsumedElement = document.getElementById('total-consumed');
 const remainingCaloriesElement = document.getElementById('remaining-calories');
@@ -17,36 +18,25 @@ function init() {
     renderTable(todayData);
 }
 
-// 處理 JSON 檔案上傳
-jsonUpload.addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
+// 處理文字貼上並匯入
+importBtn.addEventListener('click', () => {
+    const jsonText = jsonInput.value.trim();
     
-    // 當檔案讀取完成時...
-    reader.onload = function(e) {
-        try {
-            // 把檔案內容轉回 JavaScript 看得懂的資料
-            const nutritionData = JSON.parse(e.target.result);
-            
-            // 存進 LocalStorage
-            const updatedData = saveMealData(nutritionData);
-            
-            // 重新畫表格
-            renderTable(updatedData);
-            
-            alert('✅ 紀錄匯入成功！');
-        } catch (error) {
-            alert('❌ 檔案格式錯誤，請確認這是 AI 產生的 JSON 檔。');
-        }
-        
-        // 清空上傳欄位，方便下次匯入
-        jsonUpload.value = '';
-    };
+    if (!jsonText) {
+        alert('請先貼上 AI 提供的分析資料喔！');
+        return;
+    }
 
-    // 以純文字方式讀取 .json 檔
-    reader.readAsText(file);
+    try {
+        const nutritionData = JSON.parse(jsonText);
+        const updatedData = saveMealData(nutritionData);
+        renderTable(updatedData);
+        
+        alert('✅ 紀錄匯入成功！');
+        jsonInput.value = ''; // 清空輸入框
+    } catch (error) {
+        alert('❌ 格式錯誤！請確定你有完整複製 AI 給的 { ... } 內容。');
+    }
 });
 
 function renderTable(todayData) {
@@ -61,7 +51,7 @@ function renderTable(todayData) {
     if (todayData.meals.length === 0) {
         tableBody.innerHTML = `
             <tr class="empty-row">
-                <td colspan="7">今天還沒有任何紀錄喔！趕快上傳 AI 檔案吧！</td>
+                <td colspan="7">尚無紀錄，請貼上 AI 分析資料。</td>
             </tr>
         `;
         tableFooter.innerHTML = '';
@@ -92,7 +82,7 @@ function renderTable(todayData) {
 
     const formatDiff = (val) => val > 0 
         ? `<span style="color: red;">(超標 ${val}g)</span>` 
-        : `<span style="color: var(--primary-color);">(未達標 ${Math.abs(val)}g)</span>`;
+        : `<span style="color: var(--accent-color);">(未達標 ${Math.abs(val)}g)</span>`;
 
     tableFooter.innerHTML = `
         <tr style="background-color: var(--highlight-bg); font-weight: bold;">
