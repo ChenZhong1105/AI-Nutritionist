@@ -12,7 +12,7 @@
     <header class="header">
         <h1>AI 營養管理</h1>
         <nav>
-            <a href="index.html" class="active">今日紀錄</a>
+            <a href="index.html" class="active">單日紀錄</a>
             <a href="history.html">歷史回顧</a>
         </nav>
     </header>
@@ -20,7 +20,12 @@
     <main class="container">
         
         <section class="summary-section">
-            <h2 id="current-date">今日日期：載入中...</h2>
+            <!-- 全新的日期選擇器 -->
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <label for="record-date" style="font-weight: 500; margin-right: 12px; color: var(--text-muted);">📅 選擇日期：</label>
+                <input type="date" id="record-date" style="padding: 10px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 16px; outline: none; color: var(--text-main); background-color: var(--card-bg); box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+            </div>
+
             <div class="goal-card">
                 <h3>每日目標</h3>
                 <p class="goal-number">1,848 <span class="unit">kcal</span></p>
@@ -38,7 +43,6 @@
             </div>
         </section>
 
-        <!-- 全新的文字貼上區塊 -->
         <section class="upload-section">
             <h3 style="margin-bottom: 12px; font-size: 16px; color: var(--primary-color);">📥 匯入 AI 分析結果</h3>
             <textarea id="json-input" rows="7" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 15px; font-family: monospace; font-size: 14px;" placeholder="請將 AI 給你的 { ... } 資料完整貼在這裡..."></textarea>
@@ -73,7 +77,6 @@
 
     </main>
 
-    <!-- 移除了 api.js，現在只需要這兩個大腦 -->
     <script src="js/storage.js"></script>
     <script src="js/app.js"></script>
 
