@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 營養管理 - 使用說明</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header">
+        <h1>AI 營養管理</h1>
+        <nav>
+            <a href="index.html">單日紀錄</a>
+            <a href="history.html">歷史回顧</a>
+            <a href="guide.html" class="active">使用說明</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <section class="summary-section">
+            <h2 style="text-align: center; color: var(--primary-color);">🚀 快速上手指南</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-top: 10px; font-size: 14px;">只需 4 個簡單步驟，輕鬆建立你的 AI 專屬營養日記！</p>
+        </section>
+
+        <section class="guide-container">
+            
+            <!-- 步驟 1 -->
+            <div class="step-card">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h3 class="step-title">喚醒你的專屬 AI 營養師</h3>
+                    <p class="step-desc">請打開你習慣的 AI 助手（如 ChatGPT、Claude、Gemini），並將下方的「系統提示詞」完整複製貼上給它，完成初始設定。</p>
+                    
+                    <div class="prompt-box">
+                        <button id="copy-btn" class="copy-btn">📋 點擊複製提示詞</button>
+                        <pre id="ai-prompt-text">你現在是一位專業、親切且鼓勵人的「AI 專屬營養師」。我會傳給你我每天吃的食物（文字或照片）或是我的運動紀錄，請你幫我精準估算熱量與三大營養素，並給予我簡短的飲食建議。
+
+為了讓我能將資料匯入專屬的健康管理網頁，你每次的回覆都必須「嚴格遵守」以下的 JSON 格式，請用 ```json 和 ``` 將程式碼包起來，並且不要輸出多餘的聊天廢話，讓我方便直接複製。
+
+【JSON 輸出格式範例與規定】
+{
+    "mealType": "餐別",
+    "foodName": "食物或運動名稱描述",
+    "totalCalories": 0,
+    "carbs": 0,
+    "protein": 0,
+    "fat": 0,
+    "advice": "請針對這餐給予約 50 字內，溫暖、專業且具體的營養建議或鼓勵。"
+}
+
+【特別計算規則（非常重要）】
+1. mealType (餐別)：只能從「早餐、午餐、晚餐、點心、飲料、運動」這 6 個詞彙中選擇一個。
+2. 數值型態：大卡、碳水、蛋白質、脂肪都必須是「純數字」，請勿加上單位。
+3. 運動特殊規則：如果提供的是「運動」紀錄，totalCalories 請標示為「負數」（如 -300），並且將其他數值設為 0。
+
+如果了解上述規則，請回覆：「設定完成！請隨時將您的食物照片或運動紀錄傳給我吧！」</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步驟 2 -->
+            <div class="step-card">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h3 class="step-title">上傳食物照片或運動紀錄 📸</h3>
+                    <p class="step-desc">吃飯前拍張照，或是用文字告訴 AI 你吃了什麼（例如：「這是我的午餐，一個排骨便當和無糖綠茶」），如果有運動也可以把手錶截圖傳給它。</p>
+                </div>
+            </div>
+
+            <!-- 步驟 3 -->
+            <div class="step-card">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <h3 class="step-title">複製 AI 回傳的 JSON 程式碼 📋</h3>
+                    <p class="step-desc">AI 分析完成後，會回傳一段帶有 <code>{ ... }</code> 的 JSON 格式資料，請將整段資料複製起來。</p>
+                </div>
+            </div>
+
+            <!-- 步驟 4 -->
+            <div class="step-card">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                    <h3 class="step-title">匯入本網頁，完成紀錄！ 🎉</h3>
+                    <p class="step-desc">回到本網頁的「單日紀錄」，選擇正確的日期後，將剛才複製的內容貼到「匯入 AI 分析結果」的輸入框，點擊儲存，大功告成！</p>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        // 一鍵複製功能
+        document.getElementById('copy-btn').addEventListener('click', function() {
+            const promptText = document.getElementById('ai-prompt-text').innerText;
+            navigator.clipboard.writeText(promptText).then(() => {
+                const btn = document.getElementById('copy-btn');
+                btn.innerText = '✅ 已複製！請貼給 AI';
+                btn.style.backgroundColor = '#10b981';
+                btn.style.color = 'white';
+                
+                setTimeout(() => {
+                    btn.innerText = '📋 點擊複製提示詞';
+                    btn.style.backgroundColor = '#e2e8f0';
+                    btn.style.color = '#334155';
+                }, 3000);
+            }).catch(err => {
+                alert('複製失敗，請手動選取文字複製。');
+            });
+        });
+    </script>
+
+</body>
+</html>
