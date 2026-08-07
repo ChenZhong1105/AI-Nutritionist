@@ -73,3 +73,20 @@
 .copy-btn:hover {
     background: #cbd5e1;
 }
+/* =========================================
+   使用說明頁面數字徽章
+   ========================================= */
+.step-badge {
+    width: 28px;
+    height: 28px;
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
