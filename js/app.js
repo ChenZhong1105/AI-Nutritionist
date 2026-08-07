@@ -1,5 +1,5 @@
 /* =========================================
-   app.js - 首頁邏輯大腦 (支援環形圖與BMR計算機)
+   app.js - 首頁邏輯大腦 (支援環形圖、計算機、備份與 🔥運動視覺)
    ========================================= */
 
 const importBtn = document.getElementById('import-btn');
@@ -8,7 +8,6 @@ const dateInput = document.getElementById('record-date');
 const tableBody = document.getElementById('table-body');
 const tableFooter = document.getElementById('table-footer');
 
-// Modal 相關元素
 const modal = document.getElementById('settings-modal');
 const editBtn = document.getElementById('edit-goal-btn');
 const closeBtn = document.getElementById('close-modal');
@@ -39,11 +38,7 @@ function renderDashboard(dayData) {
     
     // 計算剩餘
     let remCal = goal.calories - calories;
-    let remCarbs = goal.carbs - carbs;
-    let remPro = goal.protein - protein;
-    let remFat = goal.fat - fat;
 
-    // 更新文字
     document.getElementById('dash-rem-cal').textContent = remCal < 0 ? 0 : remCal;
     document.getElementById('dash-goal-cal').textContent = `目標 ${goal.calories} 千卡`;
     
@@ -56,19 +51,16 @@ function renderDashboard(dayData) {
     document.getElementById('dash-fat-val').textContent = fat;
     document.getElementById('dash-fat-goal').textContent = goal.fat;
 
-    // 更新環形動畫 (計算 offset)
-    // 大環形 circumference = 408
-    const calPercent = Math.min(calories / goal.calories, 1);
+    const calPercent = Math.max(0, Math.min(calories / goal.calories, 1));
     document.getElementById('cal-ring').style.strokeDashoffset = 408 - (408 * calPercent);
 
-    // 小環形 circumference = 100
-    const carbsPercent = Math.min(carbs / goal.carbs, 1);
+    const carbsPercent = Math.max(0, Math.min(carbs / goal.carbs, 1));
     document.getElementById('carbs-ring').style.strokeDashoffset = 100 - (100 * carbsPercent);
     
-    const proPercent = Math.min(protein / goal.protein, 1);
+    const proPercent = Math.max(0, Math.min(protein / goal.protein, 1));
     document.getElementById('pro-ring').style.strokeDashoffset = 100 - (100 * proPercent);
     
-    const fatPercent = Math.min(fat / goal.fat, 1);
+    const fatPercent = Math.max(0, Math.min(fat / goal.fat, 1));
     document.getElementById('fat-ring').style.strokeDashoffset = 100 - (100 * fatPercent);
 }
 
@@ -100,10 +92,16 @@ function renderTable(dayData) {
 
     dayData.meals.forEach((meal, index) => {
         const tr = document.createElement('tr');
+        
+        // 🌟 更新：如果是運動，加上火焰符號並改變顏色
+        const isExercise = meal.mealType === '運動';
+        const typeDisplay = isExercise ? `🔥 ${meal.mealType}` : meal.mealType;
+        const calDisplay = isExercise ? `<span style="color: #10b981; font-weight: 700;">${meal.totalCalories}</span>` : meal.totalCalories;
+
         tr.innerHTML = `
-            <td>${meal.mealType}</td>
+            <td>${typeDisplay}</td>
             <td>${meal.foodName}</td>
-            <td>${meal.totalCalories}</td>
+            <td>${calDisplay}</td>
             <td>${meal.carbs}</td>
             <td>${meal.protein}</td>
             <td>${meal.fat}</td>
@@ -115,7 +113,7 @@ function renderTable(dayData) {
 
     tableFooter.innerHTML = `
         <tr style="background: #f8fafc; font-weight: bold;">
-            <td colspan="2">日總結</td>
+            <td colspan="2">淨熱量 (攝取-消耗)</td>
             <td>${dayData.totals.calories}</td>
             <td>${dayData.totals.carbs}</td>
             <td>${dayData.totals.protein}</td>
@@ -136,14 +134,21 @@ tableBody.addEventListener('click', (e) => {
     }
 });
 
-// --- Modal 與計算機邏輯 ---
+// Modal 與計算機邏輯
 editBtn.addEventListener('click', () => {
-    // 帶入先前的設定
     document.getElementById('user-gender').value = userProfile.gender;
     document.getElementById('user-age').value = userProfile.age;
     document.getElementById('user-height').value = userProfile.height;
     document.getElementById('user-weight').value = userProfile.weight;
     document.getElementById('user-activity').value = userProfile.activity;
+    
+    document.getElementById('res-bmr').textContent = Math.round(
+        userProfile.gender === 'male' 
+        ? (10 * userProfile.weight + 6.25 * userProfile.height - 5 * userProfile.age + 5)
+        : (10 * userProfile.weight + 6.25 * userProfile.height - 5 * userProfile.age - 161)
+    );
+    document.getElementById('res-tdee').textContent = userProfile.calories;
+
     modal.classList.add('show');
 });
 
@@ -156,11 +161,9 @@ calcSaveBtn.addEventListener('click', () => {
     const weight = Number(document.getElementById('user-weight').value);
     const activity = Number(document.getElementById('user-activity').value);
     
-    // Mifflin-St Jeor 公式
     let bmr = 10 * weight + 6.25 * height - 5 * age;
     bmr = gender === 'male' ? bmr + 5 : bmr - 161;
     
-    // 計算 TDEE 與 營養素
     const tdee = Math.round(bmr * activity);
     const carbs = Math.round((tdee * 0.4) / 4);
     const protein = Math.round((tdee * 0.3) / 4);
@@ -169,7 +172,6 @@ calcSaveBtn.addEventListener('click', () => {
     document.getElementById('res-bmr').textContent = Math.round(bmr);
     document.getElementById('res-tdee').textContent = tdee;
 
-    // 儲存進設定
     userProfile = {
         calories: tdee, carbs, protein, fat,
         gender, age, height, weight, activity
@@ -178,9 +180,43 @@ calcSaveBtn.addEventListener('click', () => {
     
     setTimeout(() => {
         modal.classList.remove('show');
-        loadDateData(); // 重新整理畫面套用新目標
+        loadDateData(); 
         alert('🎯 每日目標已根據您的身體數值更新！');
     }, 800);
+});
+
+// 匯出資料
+document.getElementById('export-btn').addEventListener('click', () => {
+    const backupData = {
+        history: localStorage.getItem('ai_dietitian_data'),
+        goal: localStorage.getItem('ai_dietitian_goal')
+    };
+    const blob = new Blob([JSON.stringify(backupData)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `我的營養紀錄備份_${getTodayKey()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+});
+
+// 匯入資料
+document.getElementById('import-file').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            const importedData = JSON.parse(event.target.result);
+            if (importedData.history) localStorage.setItem('ai_dietitian_data', importedData.history);
+            if (importedData.goal) localStorage.setItem('ai_dietitian_goal', importedData.goal);
+            alert('✅ 資料還原成功！網頁將重新載入。');
+            location.reload(); 
+        } catch (error) {
+            alert('❌ 檔案格式錯誤，無法還原資料。');
+        }
+    };
+    reader.readAsText(file);
 });
 
 document.addEventListener('DOMContentLoaded', init);
