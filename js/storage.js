@@ -11,13 +11,8 @@ function getUserProfile() {
     if (data) {
         return JSON.parse(data);
     }
-    // 預設值 (如果使用者還沒設定過)
     return {
-        calories: 2204,
-        carbs: 248,
-        protein: 165,
-        fat: 61,
-        // 記錄表單填寫狀態
+        calories: 2204, carbs: 248, protein: 165, fat: 61,
         gender: 'male', age: 25, height: 170, weight: 65, activity: 1.55 
     };
 }
@@ -26,7 +21,7 @@ function saveUserProfile(profileData) {
     localStorage.setItem(GOAL_KEY, JSON.stringify(profileData));
 }
 
-// --- 飲食紀錄資料 ---
+// --- 飲食與運動紀錄資料 ---
 function getTodayKey() {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -61,25 +56,25 @@ function saveMealData(mealData, dateKey) {
         };
     }
     
-    // 將新資料加入陣列
     allData[dateKey].meals.push(mealData);
     
-    // 🌟 全新邏輯：每次存入後，自動依照順序重新排列！
+    // 🌟 更新：加入「運動」的自動排序，永遠排在最後面
     const orderMap = {
         "早餐": 1,
         "午餐": 2,
         "晚餐": 3,
         "點心": 4,
-        "飲料": 5
+        "飲料": 5,
+        "運動": 6
     };
     
     allData[dateKey].meals.sort((a, b) => {
-        const orderA = orderMap[a.mealType] || 99; // 如果未來有未知的餐別，自動排到最後
+        const orderA = orderMap[a.mealType] || 99;
         const orderB = orderMap[b.mealType] || 99;
         return orderA - orderB;
     });
     
-    // 累加熱量與營養素
+    // 累加熱量與營養素 (如果是運動，傳入負數就會自動扣除)
     allData[dateKey].totals.calories += Number(mealData.totalCalories);
     allData[dateKey].totals.carbs += Number(mealData.carbs);
     allData[dateKey].totals.protein += Number(mealData.protein);
@@ -93,12 +88,14 @@ function deleteMealData(dateKey, mealIndex) {
     const allData = getAllData();
     if (allData[dateKey] && allData[dateKey].meals[mealIndex]) {
         const meal = allData[dateKey].meals[mealIndex];
+        
+        // 如果刪除的是運動(負數)，減去負數等於加回來，完美復原！
         allData[dateKey].totals.calories -= Number(meal.totalCalories);
         allData[dateKey].totals.carbs -= Number(meal.carbs);
         allData[dateKey].totals.protein -= Number(meal.protein);
         allData[dateKey].totals.fat -= Number(meal.fat);
         
-        allData[dateKey].totals.calories = Math.max(0, allData[dateKey].totals.calories);
+        // 確保營養素不會因為計算誤差變成負的 (但卡路里允許為負，代表消耗大於攝取)
         allData[dateKey].totals.carbs = Math.max(0, allData[dateKey].totals.carbs);
         allData[dateKey].totals.protein = Math.max(0, allData[dateKey].totals.protein);
         allData[dateKey].totals.fat = Math.max(0, allData[dateKey].totals.fat);
